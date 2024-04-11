@@ -4,11 +4,13 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/digitalocean/godo"
-	"github.com/mattermost/mattermost-server/v5/model"
-	"github.com/phillipahereza/mattermost-plugin-digitalocean/server/client"
 	"text/tabwriter"
 	"time"
+
+	"github.com/digitalocean/godo"
+	"github.com/mattermost/mattermost/server/public/model"
+
+	"github.com/phillipahereza/mattermost-plugin-digitalocean/server/client"
 )
 
 func (p *Plugin) listDatabaseClustersCommandFunc(client client.DigitalOceanService, args *model.CommandArgs) (*model.CommandResponse, *model.AppError) {

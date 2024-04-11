@@ -3,9 +3,9 @@
 package main
 
 import (
-	"strings"
+	"encoding/json"
 
-	"github.com/mattermost/mattermost-server/v5/model"
+	"github.com/mattermost/mattermost/server/public/model"
 )
 
 var manifest *model.Manifest
@@ -110,5 +110,7 @@ const manifestStr = `
 `
 
 func init() {
-	manifest = model.ManifestFromJson(strings.NewReader(manifestStr))
+	if err := json.Unmarshal([]byte(manifestStr), &manifest); err != nil {
+		panic(err)
+	}
 }

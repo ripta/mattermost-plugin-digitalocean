@@ -1,10 +1,10 @@
 package main
 
-import "github.com/mattermost/mattermost-server/v5/model"
+import "github.com/mattermost/mattermost/server/public/model"
 
 const subscriptionKVKey = "subs"
 
-//Subscription is type that keeps a record of all channels
+// Subscription is type that keeps a record of all channels
 // that'll receive updates from the DO bot.
 type Subscription struct {
 	Channels []string

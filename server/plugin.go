@@ -2,17 +2,19 @@ package main
 
 import (
 	"context"
+	"os"
 	"path/filepath"
 	"sync"
 
 	"github.com/digitalocean/godo"
 	"golang.org/x/oauth2"
 
-	"github.com/mattermost/mattermost-server/v5/model"
-	"github.com/mattermost/mattermost-server/v5/plugin"
-	"github.com/phillipahereza/mattermost-plugin-digitalocean/server/client"
+	"github.com/mattermost/mattermost/server/public/model"
+	"github.com/mattermost/mattermost/server/public/plugin"
 	"github.com/pkg/errors"
 	cron "github.com/robfig/cron/v3"
+
+	"github.com/phillipahereza/mattermost-plugin-digitalocean/server/client"
 )
 
 // Plugin implements the interface expected by the Mattermost server to communicate between the server and plugin processes.
@@ -37,19 +39,22 @@ type Plugin struct {
 func (p *Plugin) OnActivate() error {
 	p.API.RegisterCommand(getCommand())
 
-	profileImage := filepath.Join("assets", "do.png")
-
-	botID, err := p.Helpers.EnsureBot(&model.Bot{
+	botID, err := p.API.EnsureBotUser(&model.Bot{
 		Username:    "do",
 		DisplayName: "DO",
 		Description: "Created by the DigitalOcean plugin.",
-	}, plugin.ProfileImagePath(profileImage))
+	}) //, plugin.ProfileImagePath(profileImage))
 
 	if err != nil {
 		p.API.LogError("Failed to ensure digitalOcean bot", "Err", err.Error())
 		return errors.Wrap(err, "failed to ensure digitalOcean bot")
 	}
 	p.BotUserID = botID
+
+	if img, err := os.ReadFile(filepath.Join("assets", "do.png")); err == nil {
+		_ = p.API.SetProfileImage(botID, img)
+	}
+
 	store := CreateStore(p)
 
 	// Add an empty subscription where channels will be kept

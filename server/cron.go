@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/mattermost/mattermost-server/v5/model"
+	"github.com/mattermost/mattermost/server/public/model"
 	cron "github.com/robfig/cron/v3"
 )
 
