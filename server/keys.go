@@ -4,10 +4,12 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/digitalocean/godo"
-	"github.com/mattermost/mattermost-server/v5/model"
-	"github.com/phillipahereza/mattermost-plugin-digitalocean/server/client"
 	"text/tabwriter"
+
+	"github.com/digitalocean/godo"
+	"github.com/mattermost/mattermost/server/public/model"
+
+	"github.com/phillipahereza/mattermost-plugin-digitalocean/server/client"
 )
 
 func drawKeysTable(keys []godo.Key) string {

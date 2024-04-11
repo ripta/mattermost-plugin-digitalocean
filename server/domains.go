@@ -4,9 +4,11 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/mattermost/mattermost-server/v5/model"
-	"github.com/phillipahereza/mattermost-plugin-digitalocean/server/client"
 	"text/tabwriter"
+
+	"github.com/mattermost/mattermost/server/public/model"
+
+	"github.com/phillipahereza/mattermost-plugin-digitalocean/server/client"
 )
 
 func (p *Plugin) listDomainsCommandFunc(client client.DigitalOceanService, args *model.CommandArgs) (*model.CommandResponse, *model.AppError) {

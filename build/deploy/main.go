@@ -3,18 +3,19 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
 	"path/filepath"
 
-	"github.com/mattermost/mattermost-server/v5/model"
+	"github.com/mattermost/mattermost/server/public/model"
 	"github.com/mholt/archiver/v3"
 	"github.com/pkg/errors"
 )
 
 func main() {
-	err := deploy()
+	err := deploy(context.Background())
 	if err != nil {
 		fmt.Printf("Failed to deploy: %s\n", err.Error())
 		fmt.Println()
@@ -25,7 +26,7 @@ func main() {
 }
 
 // deploy handles deployment of the plugin to a development server.
-func deploy() error {
+func deploy(ctx context.Context) error {
 	if len(os.Args) < 3 {
 		return errors.New("invalid number of arguments")
 	}
@@ -38,7 +39,7 @@ func deploy() error {
 	adminPassword := os.Getenv("MM_ADMIN_PASSWORD")
 	copyTargetDirectory, _ := filepath.Abs("../mattermost-server")
 	if siteURL != "" && adminUsername != "" && adminPassword != "" {
-		return uploadPlugin(pluginID, bundlePath, siteURL, adminUsername, adminPassword)
+		return uploadPlugin(ctx, pluginID, bundlePath, siteURL, adminUsername, adminPassword)
 	}
 
 	_, err := os.Stat(copyTargetDirectory)
@@ -55,12 +56,12 @@ func deploy() error {
 
 // uploadPlugin attempts to upload and enable a plugin via the Client4 API.
 // It will fail if plugin uploads are disabled.
-func uploadPlugin(pluginID, bundlePath, siteURL, adminUsername, adminPassword string) error {
+func uploadPlugin(ctx context.Context, pluginID, bundlePath, siteURL, adminUsername, adminPassword string) error {
 	client := model.NewAPIv4Client(siteURL)
 	log.Printf("Authenticating as %s against %s.", adminUsername, siteURL)
-	_, resp := client.Login(adminUsername, adminPassword)
-	if resp.Error != nil {
-		return fmt.Errorf("Failed to login as %s: %s", adminUsername, resp.Error.Error())
+	_, _, err := client.Login(ctx, adminUsername, adminPassword)
+	if err != nil {
+		return fmt.Errorf("Failed to login as %s: %+v", adminUsername, err)
 	}
 
 	pluginBundle, err := os.Open(bundlePath)
@@ -70,15 +71,13 @@ func uploadPlugin(pluginID, bundlePath, siteURL, adminUsername, adminPassword st
 	defer pluginBundle.Close()
 
 	log.Print("Uploading plugin via API.")
-	_, resp = client.UploadPluginForced(pluginBundle)
-	if resp.Error != nil {
-		return fmt.Errorf("Failed to upload plugin bundle: %s", resp.Error.Error())
+	if _, _, err := client.UploadPluginForced(ctx, pluginBundle); err != nil {
+		return fmt.Errorf("Failed to upload plugin bundle: %+v", err)
 	}
 
 	log.Print("Enabling plugin.")
-	_, resp = client.EnablePlugin(pluginID)
-	if resp.Error != nil {
-		return fmt.Errorf("Failed to enable plugin: %s", resp.Error.Error())
+	if _, err := client.EnablePlugin(ctx, pluginID); err != nil {
+		return fmt.Errorf("Failed to enable plugin: %+v", err)
 	}
 
 	return nil

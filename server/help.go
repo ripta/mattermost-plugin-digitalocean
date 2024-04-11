@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/mattermost/mattermost-server/v5/model"
 	"strings"
+
+	"github.com/mattermost/mattermost/server/public/model"
 )
 
 const commandHelp = `* |/do help| - Run 'test' to see if you're configured to run do commands

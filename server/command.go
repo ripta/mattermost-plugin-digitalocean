@@ -5,13 +5,12 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/mattermost/mattermost-server/v5/model"
-	"github.com/mattermost/mattermost-server/v5/plugin"
+	"github.com/mattermost/mattermost/server/public/model"
+	"github.com/mattermost/mattermost/server/public/plugin"
 )
 
 // ExecuteCommand is
 func (p *Plugin) ExecuteCommand(c *plugin.Context, args *model.CommandArgs) (*model.CommandResponse, *model.AppError) {
-
 	split := strings.Fields(args.Command)
 	command := split[0]
 	parameters := []string{}

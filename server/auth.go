@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/mattermost/mattermost-server/v5/model"
 	"strings"
+
+	"github.com/mattermost/mattermost/server/public/model"
 )
 
 func (p *Plugin) isUserAuthorized(id string) (bool, *model.AppError) {
